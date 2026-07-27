@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}
+  API Introduction | POA Data Intelligence
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    .api-intro-page {
+      --panel: #ffffff;
+      --text: #1f2a37;
+      --muted: #5f6f83;
+      --line: #d9e4f2;
+      --primary: #0f4b8f;
+      --soft: #eaf3fe;
+      --ok: #0f766e;
+      --ok-soft: #e8f7f4;
+      --radius: 14px;
+      --shadow: 0 12px 28px rgba(16, 39, 71, 0.08);
+      font-family: "Noto Sans TC", sans-serif;
+      color: var(--text);
+      line-height: 1.68;
+      padding-bottom: 26px;
+    }
+
+    .api-intro-page .hero {
+      padding: 10px 0 18px;
+    }
+
+    .api-intro-page .hero-box {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(20px, 3vw, 34px);
+      background-image:
+        radial-gradient(circle at 90% 8%, #e8f7f4 0, transparent 34%),
+        radial-gradient(circle at 8% 10%, #eaf3fe 0, transparent 34%);
+    }
+
+    .api-intro-page .tag {
+      margin: 0 0 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .api-intro-page h1 {
+      margin: 0;
+      font-size: clamp(1.52rem, 2.3vw, 2.15rem);
+      line-height: 1.25;
+    }
+
+    .api-intro-page .lead {
+      margin: 12px 0 0;
+      color: var(--muted);
+      max-width: 78ch;
+    }
+
+    .api-intro-page .badge-list {
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .api-intro-page .badge-list li {
+      background: var(--soft);
+      border: 1px solid #c8ddf8;
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .api-intro-page .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .api-intro-page .card {
+      grid-column: span 12;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .api-intro-page .card h2,
+    .api-intro-page .card h3 {
+      margin: 0 0 10px;
+      line-height: 1.3;
+    }
+
+    .api-intro-page .list {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .api-intro-page .code {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #c7d6ea;
+      background: #f7fbff;
+      font-family: "Courier New", monospace;
+      color: #153a63;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .api-intro-page .ok {
+      background: var(--ok-soft);
+      border-color: #b8e6dd;
+    }
+
+    .api-intro-page .ok h3 {
+      color: var(--ok);
+    }
+
+    .api-intro-page .half {
+      grid-column: span 12;
+    }
+
+    @media (min-width: 900px) {
+      .api-intro-page .half {
+        grid-column: span 6;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="col-12 api-intro-page">
+    <header class="hero">
+      <div class="hero-box">
+        <p class="tag">API Introduction</p>
+        <h1>REST API in Modern Web Development</h1>
+        <p class="lead">
+          REST API 是目前網頁開發與系統整合的主流方式。它可以把資料分析能力獨立成服務，讓網站前端、Python 程式、其他應用程式，甚至後台系統都能以同一套介面呼叫。
+        </p>
+        <ul class="badge-list" aria-label="API topics">
+          <li>RESTful Style</li>
+          <li>JSON Response</li>
+          <li>Cross-Platform Integration</li>
+          <li>Backend Service Architecture</li>
+        </ul>
+      </div>
+    </header>
+
+    <section class="grid">
+      <article class="card half">
+        <h2>Web Development Trend / 開發趨勢</h2>
+        <p>
+          現代網站不再只把邏輯寫在前端頁面，而是把功能切成 API 服務。前端只負責顯示與互動，後端提供乾淨的資料介面，這樣更容易維護、擴充與跨平台共用。
+        </p>
+        <p style="margin-top:10px;">
+          在這個專案裡，我們把熱門關鍵詞、人物分析、關聯度分析、新聞段落擷取、情緒分析等功能都做成可直接呼叫的 API。
+        </p>
+      </article>
+
+      <article class="card half">
+        <h2>Our APIs / 本專案 API</h2>
+        <ul class="list">
+          <li>熱門關鍵詞（Top Keywords）</li>
+          <li>人物分析（Top Persons）</li>
+          <li>關聯度分析（Correlation）</li>
+          <li>新聞段落搜尋（Paragraph Retrieval）</li>
+          <li>情緒分析（Sentiment Analysis）</li>
+          <li>其他更多分析功能都可以逐步封裝成 API</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>API Response / 回傳格式</h2>
+        <p>我們建議所有 API 都回傳 JSON，讓前端、Python、React 或其他系統都能輕鬆處理。</p>
+        <div class="code">{
+  "status": "ok",
+  "query": "政治",
+  "data": [
+    { "keyword": "選舉", "score": 98 },
+    { "keyword": "政策", "score": 89 }
+  ]
+}</div>
+      </article>
+
+      <article class="card half ok">
+        <h3>Why REST API?</h3>
+        <p>
+          REST API 的好處是簡單、標準、跨平台，而且很適合拆分成前後端分離的系統架構。你可以讓使用者直接呼叫，也可以讓自己的網站後台或 AI Agent 呼叫。
+        </p>
+      </article>
+
+      <article class="card half">
+        <h3>Use Cases / 使用情境</h3>
+        <p>
+          這些 API 可以直接提供給一般使用者查詢，也可以供你自己的網站後台、管理系統、AI 應用或資料儀表板整合使用。
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>How to Call / 呼叫方式</h2>
+        <p>以下每個範例都同時示範 GET（查詢）與 POST（送出條件/建立分析任務）。</p>
+        <div class="grid">
+          <section class="card half" style="border:1px solid #c7d6ea; background:#f7fbff;">
+            <h3>1. Python</h3>
+            <div class="code">import requests
+
+# GET
+get_url = "https://example.com/api/top-keywords"
+get_res = requests.get(get_url, params={"query": "政治"})
+print(get_res.json())
+
+# POST
+post_url = "https://example.com/api/correlation"
+payload = {"keyword_a": "台積電", "keyword_b": "AI"}
+post_res = requests.post(post_url, json=payload)
+print(post_res.json())</div>
+          </section>
+
+          <section class="card half" style="border:1px solid #c7d6ea; background:#f7fbff;">
+            <h3>2. jQuery</h3>
+            <div class="code">$.ajax({
+  url: '/api/top-keywords',
+  method: 'GET',
+  data: { query: '政治' },
+  success: function (res) {
+    console.log(res);
+  }
+});
+
+$.ajax({
+  url: '/api/correlation',
+  method: 'POST',
+  contentType: 'application/json',
+  data: JSON.stringify({ keyword_a: '台積電', keyword_b: 'AI' }),
+  success: function (res) {
+    console.log(res);
+  }
+});</div>
+          </section>
+
+          <section class="card half" style="border:1px solid #c7d6ea; background:#f7fbff;">
+            <h3>3. JavaScript</h3>
+            <div class="code">fetch('/api/top-keywords?query=政治')
+  .then(res => res.json())
+  .then(data => {
+    console.log(data);
+  });
+
+fetch('/api/correlation', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ keyword_a: '台積電', keyword_b: 'AI' })
+})
+  .then(res => res.json())
+  .then(data => {
+    console.log(data);
+  });</div>
+          </section>
+
+          <section class="card half" style="border:1px solid #c7d6ea; background:#f7fbff;">
+            <h3>4. ReactJS</h3>
+            <div class="code">// GET
+useEffect(() => {
+  fetch('/api/top-keywords?query=政治')
+    .then(res => res.json())
+    .then(setData);
+}, []);</div>
+
+            <div class="code">// POST
+const createCorrelation = async () => {
+  const res = await fetch('/api/correlation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keyword_a: '台積電', keyword_b: 'AI' })
+  });
+  const data = await res.json();
+  console.log(data);
+};</div>
+          </section>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Typical Flow / 典型流程</h2>
+        <div class="code">Client / Frontend / Python App / React App -> REST API -> Django View -> Analysis Function -> JSON Response</div>
+        <ul class="list">
+          <li>先送出 query、category、date range 等參數。</li>
+          <li>後端執行分析邏輯，回傳標準 JSON。</li>
+          <li>前端或其他應用程式再把結果渲染成圖表、列表或報表。</li>
+        </ul>
+      </article>
+    </section>
+  </div>
+{% endblock %}

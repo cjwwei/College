@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block title %}Yahoo新聞爬取與AI情緒分析：管理命令與排程自動化教學指南{% endblock %}
+
+{% block content %}
+<!-- 引入 Highlight.js CSS 實現精美代碼高亮 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<style>
+    /* 確保所有程式碼區塊都有美觀的灰色底色、內縮與圓角 */
+    pre code {
+        background-color: #f6f8fa !important;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        padding: 16px !important;
+        display: block;
+        overflow-x: auto;
+        font-family: ui-monospace, SFMono-Regular, SF Pro Text, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 11.5pt;
+        line-height: 1.6;
+    }
+    .card {
+        border-radius: 8px;
+        margin-bottom: 24px;
+    }
+    .card-header {
+        border-top-left-radius: 8px !important;
+        border-top-right-radius: 8px !important;
+        border-bottom: 1px solid #e9ecef;
+        background-color: #f8f9fa !important;
+    }
+    .badge-teach {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+    .structure-tree {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 15px;
+        border-radius: 6px;
+        font-family: "Courier New", monospace;
+        font-size: 11pt;
+        line-height: 1.5;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <!-- 頁面標題 -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="h3 mb-1 text-primary">Yahoo新聞爬取與AI情緒分析：管理命令與排程自動化教學指南</h2>
+            <p class="text-muted">Django 管理命令自訂、自動化排程與前端 Web API 整合教學指南</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            
+            <!-- 第一章：管理命令的發現機制 -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fs-6 fw-bold text-dark">一、 Django 管理命令的發現機制</h5>
+                </div>
+                <div class="card-body">
+                    <p>Django 通過以下機制自動發現並載入自訂的管理命令（Management Commands）：</p>
+                    <ol class="lh-lg">
+                        <li><strong>標準目錄結構</strong>：必須放在 App 下的 <code>management/commands/</code> 目錄中。</li>
+                        <li><strong>應用註冊</strong>：該 App（例如：<code>'sentiment'</code>）必須在中註冊於 <code>settings.py</code> 的 <code>INSTALLED_APPS</code>。</li>
+                        <li><strong>自動掃描掃描</strong>：執行 <code>python manage.py</code> 時，Django 會自動掃描所有已註冊應用的命令目錄。</li>
+                        <li><strong>命令命名</strong>：Python 檔案的名稱即為終端機執行的命令名稱。</li>
+                    </ol>
+                    <p class="mt-3 font-weight-bold">手動執行命令方式：</p>
+                    <pre><code class="language-bash"># 執行 Yahoo 新聞爬蟲
+python manage.py scrape_yahoo
+
+# 執行 AI 情緒分析
+python manage.py analyze_sentiment</code></pre>
+                </div>
+            </div>
+
+            <!-- 第二章：基礎與進階排程方案 -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fs-6 fw-bold text-dark">二、 後端自動化排程執行方案</h5>
+                </div>
+                <div class="card-body">
+                    <h6>1. Linux 系統環境 (使用 Crontab)</h6>
+                    <pre><code class="language-bash"># 編輯系統排程: crontab -e
+# 每小時執行一次爬蟲，並記錄日誌
+0 * * * * cd /path/to/project && /path/to/venv/bin/python manage.py scrape_yahoo >> /var/log/scrape.log 2>&1
+# 每天凌晨 2 點執行情緒分析
+0 2 * * * cd /path/to/project && /path/to/venv/bin/python manage.py analyze_sentiment >> /var/log/analyze.log 2>&1</code></pre>
+                    
+                    <h6 class="mt-4">2. Python 輕量級排程套件 (常駐守護進程)</h6>
+                    <pre><code class="language-python"># scheduler.py (適合學生在 Windows 環境測試)
+import time
+import schedule
+from subprocess import call
+
+def run_crawler():
+    call(["python", "manage.py", "scrape_yahoo"])
+
+def run_analyzer():
+    call(["python", "manage.py", "analyze_sentiment"])
+
+# 設定排程週期
+schedule.every().hour.do(run_crawler)
+schedule.every().day.at("02:00").do(run_analyzer)
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)</code></pre>
+
+                    <h6 class="mt-4">3. 進階跨平台方案：APScheduler</h6>
+                    <p>在 Django 中推薦使用 <code>django-apscheduler</code> 套件，它能將排程作業直接持久化儲存至 Django 資料庫：</p>
+                    <pre><code class="language-bash">pip install django-apscheduler
+python manage.py migrate</code></pre>
+                </div>
+            </div>
+
+            <!-- 第三章：Web 控制 API (展示與教學精簡版) -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fs-6 fw-bold text-dark">三、 動態排程控制 Web API (精簡重構版)</h5>
+                    <span class="badge-teach">精簡重構示範</span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">為了方便前端網頁後台（Dashboard）進行點擊操控，我們將原有的多個 API 函式進行重構，利用<b>字典映射（Dictionary Mapping）</b>與<b>多方法路由合併</b>技術進行程式碼精簡，非常適合向學生展示高質感的代碼寫法：</p>
+                    
+                    <pre><code class="language-python">import subprocess
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from . import scheduler_manager
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def api_scheduler_control(request):
+    """
+    【教學點 1】合併狀態查詢(GET)與排程開關(POST)。
+    簡化多個視圖函式，建立乾淨的單一控制通道。
+    """
+    if request.method == "GET":
+        status = scheduler_manager.get_job_status()
+        return JsonResponse(status)
+        
+    # POST 請求處理開關
+    action = request.POST.get("action", "")
+    if action == "start":
+        scheduler_manager.start_jobs()
+        return JsonResponse({"status": "success", "message": "排程已啟動"})
+    elif action == "stop":
+        scheduler_manager.stop_jobs()
+        return JsonResponse({"status": "success", "message": "排程已取消"})
+        
+    return JsonResponse({"status": "error", "message": "未知的操作指令"}, status=400)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_run_task(request):
+    """
+    【教學點 2】利用 Python 字典映射代替繁瑣的 if-elif，優化擴充性。
+    【教學點 3】使用 subprocess.Popen 實現非同步背景執行，防止網頁 HTTP 請求因耗時爬蟲而卡死。
+    """
+    task = request.POST.get("task", "")
+    task_mapping = {
+        "scraper": "scrape_yahoo",
+        "analyzer": "analyze_sentiment"
+    }
+    
+    if task in task_mapping:
+        # Popen 會直接在系統背景另開子程序執行，不會阻塞當前的 Web 執行緒
+        subprocess.Popen(["python", "manage.py", task_mapping[task]])
+        return JsonResponse({"status": "success", "message": f"{task} 任務已在背景啟動"})
+        
+    return JsonResponse({"status": "error", "message": "未知的任務"}, status=400)
+
+@require_http_methods(["GET"])
+def api_scheduler_history(request):
+    """【教學點 4】健全的錯誤例外處理機制，確保 API 必定回應結構化 JSON。"""
+    try:
+        history = scheduler_manager.get_execution_history()
+        return JsonResponse(history, safe=False)
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)</code></pre>
+
+                    <div class="alert alert-info mt-3">
+                        <strong>💡 課堂引導提示：</strong>
+                        <ul>
+                            <li><b>非同步觀念：</b>向學生強調 <code>subprocess.Popen</code> 與 <code>call</code> 的區別。網頁後端如果執行了需要花費數分鐘的爬蟲任務，必須丟到背景，否則網頁會出現逾時錯誤（Timeout）。</li>
+                            <li><b>代碼簡潔度：</b>利用 <code>task_mapping</code> 字典，如果未來增加了第 3 個、第 4 個任務（例如：<code>report_generator</code>），只需要在字典中加一行即可，不需修改主邏輯。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第四章：Django Command 用法與檔案結構 -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fs-6 fw-bold text-dark">四、 Django Command 用法與檔案結構（板書與教學大綱）</h5>
+                    <span class="badge-teach">學生必學基礎</span>
+                </div>
+                <div class="card-body">
+                    <p>為了配合上述 API 與排程器呼叫 <code>manage.py [命令名稱]</code>，專案必須建立正確的實體檔案結構。以下是完整的標準檔案結構與核心代碼架構：</p>
+                    
+                    <h6>1. Django 專案標準檔案結構樹</h6>
+                    <p class="text-muted">請提醒學生，<code>management</code> 和 <code>commands</code> 這兩個資料夾名稱是 Django 內建固定的，且<b>每一層目錄內都必須包含空的 <code>__init__.py</code> 檔</b>，否則 Django 會找不到命令。</p>
+                    
+                    <pre class="structure-tree mb-4">
+poa_project/                      &lt;-- Django 專案根目錄
+├── manage.py                     &lt;-- 專案管理進入點
+├── website_config/               &lt;-- 專案主要設定目錄 (settings.py 等)
+└── app_comment_sentiment/        &lt;-- 你的 Django App 應用程式名稱
+    ├── __init__.py
+    ├── models.py                 &lt;-- 儲存 Yahoo 新聞與情緒分數的資料模型
+    ├── views.py                  &lt;-- 存放上述精簡後的控制 API
+    └── management/               &lt;-- [核心重點] 手動建立此資料夾
+        ├── __init__.py
+        └── commands/             &lt;-- [核心重點] 手動建立此資料夾
+            ├── __init__.py
+            ├── scrape_yahoo.py       &lt;-- 實作 python manage.py scrape_yahoo
+            └── analyze_sentiment.py  &lt;-- 實作 python manage.py analyze_sentiment
+                    </pre>
+
+                    <h6 class="mt-4">2. 自訂命令（Custom Command）核心骨架範本</h6>
+                    <p class="text-muted">以 <code>scrape_yahoo.py</code> 為例，向學生說明自訂管理命令時的標準寫法與三大組成要素：</p>
+                    
+                    <pre><code class="language-python"># app_comment_sentiment/management/commands/scrape_yahoo.py
+from django.core.management.base import BaseCommand
+from app_comment_sentiment.models import Article  # 可以自由引入專案內的 Models 進行資料庫操作
+
+class Command(BaseCommand):
+    # 要素 1: 命令的說明文字 (當執行 python manage.py help scrape_yahoo 时會顯示)
+    help = '自動爬取 Yahoo 最新焦點新聞，並寫入資料庫儲存'
+
+    # 要素 2: 定義終端機可以接收的參數引數 (選填)
+    def add_arguments(self, parser):
+        # 示範讓學生知道可以限制爬取篇數
+        parser.add_argument(
+            '--limit', 
+            type=int, 
+            default=10, 
+            help='指定本次要爬取的新聞篇數'
+        )
+
+    # 要素 3: 核心邏輯執行進入點
+    def handle(self, *args, **options):
+        # 取得參數
+        limit = options['limit']
+        
+        # 在 Django 命令中，建議使用 self.stdout.write 替代 print()，可支援終端機特殊顏色
+        self.stdout.write(self.style.SUCCESS(f"【系統提示】開始執行 Yahoo 新聞爬蟲，目標篇數: {limit} 篇"))
+        
+        try:
+            # -----------------------------------------------------------------
+            # [課堂實作核心：在此處撰寫學生的爬蟲邏輯]
+            # 範例：
+            # res = requests.get("https://tw.news.yahoo.com/")
+            # soup = BeautifulSoup(res.text, "html.parser")
+            # ... 迴圈解析並透過 NewsArticle.objects.create(...) 存入資料庫
+            # -----------------------------------------------------------------
+            
+            # 成功日誌
+            self.stdout.write(self.style.SUCCESS(f"【成功】成功爬取並儲存 {limit} 篇 Yahoo 新聞！"))
+            
+        except Exception as e:
+            # 錯誤日誌
+            self.stdout.write(self.style.ERROR(f"【失敗】爬蟲執行過程中發生致命錯誤: {str(e)}"))
+</code></pre>
+
+                    <h6 class="mt-4">3. 核心組成 API 課堂重點拆解說明</h6>
+                    <table class="table table-bordered mt-2">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 25%;">關鍵元件 / 方法</th>
+                                <th>課堂講解核心重點（適合老師口述備忘）</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-secondary">BaseCommand</td>
+                                <td>這是 Django 所有管理命令的基底類別。繼承它之後，Django 才會在執行 <code>manage.py</code> 時載入此腳本，並自動幫我們初始化好整個專案的環境設定（如資料庫連線、環境變數）。</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary">add_arguments()</td>
+                                <td>底層使用的是 Python 標準庫的 <code>argparse</code> 機制。適合用來傳遞指令開關或條件限制（如：<code>--date 2026-05-17</code>）。這可以培養學生「不要把代碼參數寫死（Hardcode）」的好習慣。</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary">handle()</td>
+                                <td><b>最重要的方法。</b> 所有的商務邏輯、爬蟲、AI 分析演算法都必須寫在這裡面。傳入的 <code>options</code> 參數是一個字典，包含了所有從 <code>add_arguments</code> 接收到的外部參數。</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary">self.stdout.write()</td>
+                                <td>管理命令專屬的標準輸出。搭配 <code>self.style.SUCCESS</code> 會在 Linux/Windows 終端機印出<b>綠色文字</b>；搭配 <code>self.style.ERROR</code> 則會印出<b>紅色文字</b>，對於排程自動化執行時的日誌辨識度極高。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- 引入 Highlight.js 主程式套件 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // 自動尋找網頁中符合 class="language-*" 的代碼區塊進行精美渲染
+        hljs.highlightAll();
+    });
+</script>
+{% endblock %}

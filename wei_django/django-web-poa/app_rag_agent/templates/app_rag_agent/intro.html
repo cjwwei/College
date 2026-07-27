@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Agentic RAG 金融諮詢介紹 | 輿情分析平台
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .intro-card {
+        border-radius: 16px;
+        background: #ffffff;
+        padding: 28px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    }
+    .section-title {
+        color: #1e3c72;
+        font-weight: 700;
+    }
+    .section-subtitle {
+        color: #334155;
+    }
+    .feature-list li {
+        margin-bottom: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="col-lg-12">
+    <div class="card intro-card">
+        <h1 class="section-title">Agentic RAG 金融諮詢 APP 介紹</h1>
+        <p class="section-subtitle">這是一個結合財經新聞檢索、語意理解與智能代理人決策能力的互動式金融智能助手。</p>
+
+        <hr>
+
+        <h4 class="mt-4">1. 這個 APP 的用途是什麼？</h4>
+        <p>本 APP 主要用途是幫助使用者快速查詢台灣半導體、IC 設計、電子產業等財經新聞資訊，並提供：
+        具體新聞引用、分類過濾、目標價估算、以及安全範圍內的智能回覆。</p>
+
+        <h4 class="mt-4">2. 整體流程說明</h4>
+        <ol class="feature-list">
+            <li><strong>使用者輸入問題</strong>：例如「查聯發科最新發表的晶片特色」或「整理 IC 設計類別新聞連結」。</li>
+            <li><strong>系統判斷問題類型</strong>：模型會決定是要使用語意檢索、分類 SQL 查詢，或是數學計算工具。</li>
+            <li><strong>調用工具或檢索資料</strong>：如果是新聞查詢，會透過 RAG 將語意查詢轉為向量並檢索新聞片段；如果是分類清單，則直接做 SQL 濾搜；如果是估值計算，會使用內建計算工具。</li>
+            <li><strong>生成回答</strong>：模型根據檢索結果與工具輸出，整合成清楚、有來源標註的答案回傳給使用者。</li>
+            <li><strong>對話歷史保存</strong>：每次提問與回答會被存進 session，讓下一輪對話可以延續上下文。</li>
+        </ol>
+
+        <h4 class="mt-4">3. 什麼是 RAG？</h4>
+        <p>RAG 全名是 <strong>Retrieval-Augmented Generation</strong>（檢索增強式生成）。
+        它的核心概念是：先從資料庫檢索出相關內容，再把這些真實資料交給語言模型生成回答，避免模型單憑記憶或猜測產生幻覺。</p>
+        <p>在本 APP 中，RAG 的作用是：</p>
+        <ul class="feature-list">
+            <li>把使用者問題轉為語意向量</li>
+            <li>在財經新聞資料庫中找到最相關的新聞片段</li>
+            <li>用檢索到的新聞片段當作依據來回答問題</li>
+        </ul>
+
+        <h4 class="mt-4">4. Agent 代理人背後在做什麼？</h4>
+        <p>這裡的 Agent 是指「能夠主動決策或呼叫外部工具的語言模型」，而不是只純粹用規則回答的聊天機器人。</p>
+        <p>本 APP 的 Agent 背後運作流程：
+        它會根據問題判斷是否需要進行以下動作：</p>
+        <ul class="feature-list">
+            <li>呼叫 <strong>news search</strong> 工具進行語意檢索</li>
+            <li>呼叫 <strong>category list</strong> 工具進行 SQL 篩選</li>
+            <li>呼叫 <strong>估值計算</strong> 工具做精確數學運算</li>
+        </ul>
+        <p>Agent 的優勢是它可以依據不同問題，自主選擇最適合的工具，並整合結果輸出一致的回答。</p>
+
+        <h4 class="mt-4">5. 為什麼要把 RAG 與 Agent 結合？</h4>
+        <p>RAG 和 Agent 各有強項，合在一起可以補足彼此的不足：</p>
+        <ul class="feature-list">
+            <li><strong>RAG 提供事實依據</strong>：避免模型直接憑空生成答案，降低誤導風險。</li>
+            <li><strong>Agent 提供工具調度</strong>：根據問題自動選擇檢索、過濾或計算工具。</li>
+            <li><strong>實現更高品質回覆</strong>：同時兼顧資料正確性、金融專業性與使用者需求。</li>
+        </ul>
+
+        <div class="mt-4 p-4 rounded-3" style="background:#f1f5f9; border:1px solid #dbeafe;">
+            <h5>快速理解</h5>
+            <p>簡單來說，這個 APP 的核心就是：</p>
+            <ul class="feature-list">
+                <li>用「財經新聞資料庫」提供真實資料</li>
+                <li>用「RAG」把資料變成模型可用的依據</li>
+                <li>用「Agent」決定何時呼叫檢索或計算工具</li>
+            </ul>
+        </div>
+
+        <a href="{% url 'app_rag_agent:chat_view' %}" class="btn btn-primary btn-lg mt-4">回到 Agentic RAG 聊天頁面</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Course Introduction | POA Data Intelligence
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    .course-intro-page {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2a37;
+      --muted: #5b6777;
+      --line: #dbe3ef;
+      --primary: #124c8c;
+      --primary-soft: #e8f1fb;
+      --accent: #0f766e;
+      --accent-soft: #eefbf8;
+      --shadow: 0 12px 30px rgba(15, 39, 72, 0.08);
+      --radius: 14px;
+      font-family: "Noto Sans TC", sans-serif;
+      color: var(--text);
+      line-height: 1.65;
+      padding-bottom: 28px;
+    }
+
+    .course-intro-page .hero {
+      padding: 10px 0 18px;
+    }
+
+    .course-intro-page .hero-panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(20px, 3vw, 34px);
+      background-image:
+        radial-gradient(circle at 8% 12%, #eaf3ff 0, transparent 34%),
+        radial-gradient(circle at 92% 8%, #e9f9f5 0, transparent 32%);
+    }
+
+    .course-intro-page .eyebrow {
+      margin: 0 0 8px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+    }
+
+    .course-intro-page h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 2.3vw, 2.2rem);
+      line-height: 1.25;
+    }
+
+    .course-intro-page .subtitle {
+      margin: 12px 0 0;
+      color: var(--muted);
+      max-width: 78ch;
+    }
+
+    .course-intro-page .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .course-intro-page .chips li {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid #c6d9f2;
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .course-intro-page .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .course-intro-page .card {
+      grid-column: span 12;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .course-intro-page .card h2,
+    .course-intro-page .card h3 {
+      margin: 0 0 10px;
+      line-height: 1.3;
+    }
+
+    .course-intro-page .card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .course-intro-page .list {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .course-intro-page .list li + li {
+      margin-top: 6px;
+    }
+
+    .course-intro-page .timeline {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .course-intro-page .timeline li {
+      border-left: 3px solid #c6d9f2;
+      padding-left: 11px;
+      color: var(--muted);
+    }
+
+    .course-intro-page .timeline strong {
+      color: var(--text);
+    }
+
+    .course-intro-page .highlight {
+      background: var(--accent-soft);
+      border-color: #bae6de;
+    }
+
+    .course-intro-page .highlight h3 {
+      color: var(--accent);
+    }
+
+    .course-intro-page .half {
+      grid-column: span 12;
+    }
+
+    .course-intro-page .footer-note {
+      margin-top: 6px;
+      color: #607083;
+      font-size: 0.92rem;
+      text-align: center;
+    }
+
+    @media (min-width: 900px) {
+      .course-intro-page .half {
+        grid-column: span 6;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="col-12 course-intro-page">
+    <header class="hero">
+      <div class="hero-panel">
+        <p class="eyebrow">Course Introduction</p>
+        <h1>大數據分析：POA 輿情系統實作</h1>
+        <p class="subtitle">
+          這是一門整合型課程：自然語言處理、網頁前後端技術、大型語言模型應用與深度學習、爬蟲技術與 Python 資料分析。
+          我們以真實的新聞輿情平台為主軸，帶你從資料分析走到 Agentic AI 系統落地。
+        </p>
+        <ul class="chips" aria-label="Course keywords">
+          <li>Public Opinion Analysis</li>
+          <li>Python+Pandas</li>
+          <li>Django+Database</li>
+          <li>LLM</li>
+          <li>Agentic Workflow + RAG</li>
+        </ul>
+      </div>
+    </header>
+
+    <section class="grid" id="about">
+      <article class="card half highlight">
+        <h2>About This Course / 課程簡介</h2>
+        <p>
+          This course focuses on public opinion analysis as a practical integration of natural language processing, web development, large language models, and Python data analysis. With a real news and public opinion platform as the main example, you will learn how to move from data analysis to an Agentic AI system.
+        </p>
+        <p>
+          本課程以新聞輿情平台為主軸，整合 Python 資料分析、NLP、網頁前後端與大型語言模型應用，帶你從資料分析走向可落地的 Agentic AI 系統。
+        </p>
+      </article>
+
+      <article class="card half" id="syllabus">
+        <h2>Syllabus / 授課主題</h2>
+        <ul class="list">
+          <li><strong>Python 基礎 / Python Introduction：</strong>Python資料分析、NumPy、Pandas。</li>
+          <li><strong>自然語言處理 / NLP：</strong>斷詞、詞性分析、命名實體分析、詞頻統計、全文檢索。</li>
+          <li><strong>語言模型AI / LLM：</strong>新聞情緒分析、Agent AI、RAG語意搜尋。</li>
+          <li><strong>網頁技術 / Website Design：</strong>爬蟲、Django、前端互動與後端整合、Ajax與REST API。 </li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>深度學習主題</h2>
+        <h3>大型語言模型與輿情分析的應用</h3>
+        <ul class="list">
+          <li>1. 使用大型語言模型進行情緒分析</li>
+          <li>2. 製作新聞摘要</li>
+          <li>3. 大型語言模型的代理人（Agent）應用</li>
+          <li>4. RAG 的語意新聞內容查詢</li>
+        </ul>
+      </article>
+
+      <article class="card" id="why-us">
+        <h2>Why Choose This Course? / 為什麼要選修這門課？</h2>
+        <p>
+          這是一門整合型課程，你會把大學與研究所學過的 IT 技術整合起來，完成一個真實可運行的系統。
+          You will not only learn concepts, but also complete a deployable project.
+        </p>
+        <ul class="list">
+          <li>你會學到目前業界重視的技能：Python、Django、JavaScript、NLP、LLM、RAG、Agentic Workflow。</li>
+          <li>Learning by doing：從做中學、從範例中學、逐步拆解練習。</li>
+          <li>課程成果可轉化為履歷與作品集，提升前後端、資料分析與 AI 工程競爭力。</li>
+        </ul>
+      </article>
+
+      <article class="card" id="grading">
+        <h2>Scoring / Grading 評分規定</h2>
+        <ul class="list">
+          <li>1. (20%) Class exercises and attendance / 課堂操作與出席上課</li>
+          <li>2. (15%) homework / 作業</li>
+          <li>3. (30%) Midterm project / 期中專案：Public Opinion Analysis Website (Basic)</li>
+          <li>4. (35%) Term project / 期末專案：Public Opinion Analysis Website (Complete)</li>
+          <li>個人+AI一起完成專案</li>
+        </ul>
+      </article>
+
+      <article class="card" id="faq">
+        <h2>Frequently Asked Questions / 常見問題</h2>
+        <div class="accordion" id="courseFaq">
+          
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHead3">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
+                1. I have no Python background. Is this course suitable? / 沒有 Python 基礎適合嗎？
+              </button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse" aria-labelledby="faqHead3" data-bs-parent="#courseFaq">
+              <div class="accordion-body">
+                不建議完全零基礎。若已有基礎程式能力，跟著課程步驟實作，會有很好的學習成效。
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHead4">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">
+                2. I know programming but not web development. Can I handle it? / 有程式基礎但沒做過網頁，適合嗎？
+              </button>
+            </h2>
+            <div id="faq4" class="accordion-collapse collapse" aria-labelledby="faqHead4" data-bs-parent="#courseFaq">
+              <div class="accordion-body">
+                可以，但需要花更多時間。課程會用到前後端整合與 JavaScript，建議先複習基本網頁概念。利用AI協助，Vibe Coding也行。
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHead5">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5" aria-expanded="false" aria-controls="faq5">
+                3. What if I cannot complete the midterm/final project? / 期中期末專案不會做怎麼辦？
+              </button>
+            </h2>
+            <div id="faq5" class="accordion-collapse collapse" aria-labelledby="faqHead5" data-bs-parent="#courseFaq">
+              <div class="accordion-body">
+                只要掌握課堂範例與每週任務，通常都能完成。利用AI協助，Vibe Coding也行。
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHead6">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6" aria-expanded="false" aria-controls="faq6">
+                4. What should I do when coding issues appear? / 寫程式遇到問題怎麼辦？
+              </button>
+            </h2>
+            <div id="faq6" class="accordion-collapse collapse" aria-labelledby="faqHead6" data-bs-parent="#courseFaq">
+              <div class="accordion-body">
+                請AI協助，或再詢問助教與老師。課程提供固定討論與解題支援時段。
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHead7">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7" aria-expanded="false" aria-controls="faq7">
+                5. Who is eligible for this course? / 這門課適合哪些人？
+              </button>
+            </h2>
+            <div id="faq7" class="accordion-collapse collapse" aria-labelledby="faqHead7" data-bs-parent="#courseFaq">
+              <div class="accordion-body">
+                適合想學整合型 IT 技術、想加強程式能力、想進入資料分析與 AI 應用、想做前後端整合與實務系統開發的同學。
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHead8">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8" aria-expanded="false" aria-controls="faq8">
+                6. I am from management background. Is this course suitable? / 我是管理組，適合修嗎？
+              </button>
+            </h2>
+            <div id="faq8" class="accordion-collapse collapse" aria-labelledby="faqHead8" data-bs-parent="#courseFaq">
+              <div class="accordion-body">
+                只要具備基礎程式能力就可以。跟著課堂節奏與作業練習，多數管理背景同學都能完成專案並取得成果。
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHead9">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq9" aria-expanded="false" aria-controls="faq9">
+                7. What computer specification is recommended? / 修課需要什麼電腦配備？
+              </button>
+            </h2>
+            <div id="faq9" class="accordion-collapse collapse" aria-labelledby="faqHead9" data-bs-parent="#courseFaq">
+              <div class="accordion-body">
+                一般桌機或筆電即可。建議記憶體至少 8GB，以便順暢執行開發與資料分析環境。
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHead10">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq10" aria-expanded="false" aria-controls="faq10">
+                8. Do I need my own laptop? / 一定要自備筆電嗎？
+              </button>
+            </h2>
+            <div id="faq10" class="accordion-collapse collapse" aria-labelledby="faqHead10" data-bs-parent="#courseFaq">
+              <div class="accordion-body">
+                不一定。可使用教室電腦完成課堂操作；若有自己的筆電，帶來上課會更方便銜接課後練習。
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <p class="footer-note">POA Course · Data Intelligence Practice</p>
+  </div>
+{% endblock %}

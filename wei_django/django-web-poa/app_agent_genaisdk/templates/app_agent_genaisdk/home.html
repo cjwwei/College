@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+
+        /* Chat area: fixed height and scroll for long conversations */
+        .chat-box {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        /* Message alignment by role */
+        .message-row { margin-bottom: 15px; display: flex; }
+        .message-row.user { justify-content: flex-end; }
+        .message-row.bot { justify-content: flex-start; }
+        /* Animate new messages for subtle feedback */
+        .message-row { animation: fadeInUp 0.2s ease-out; }
+        
+        /* Message bubble styling */
+        .msg {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            line-height: 1.5;
+        }
+        .user .msg { background-color: #0d6efd; color: white; border-bottom-right-radius: 0; }
+        .bot .msg { background-color: white; border: 1px solid #dee2e6; border-bottom-left-radius: 0; }
+
+        /* Prompt button hover feedback */
+        .prompt-btn {
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .prompt-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Entrance animation for messages */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>POA 輿情智能代理 <span class="badge bg-primary fs-6">原生 genai SDK 基礎版</span></h2>
+                <button type="button" id="clear-btn" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash"></i> 清除對話紀錄
+                </button>
+            </div>
+            
+            <div id="chat-box" class="chat-box mb-3 bg-white shadow-sm">
+                <!-- Messages are appended here by JS -->
+                {% if not chat_history %}
+                <div class="message-row bot" id="welcome-msg">
+                    <div class="msg">
+                        您好！我是 POA 輿情分析助理。我可以幫您查詢各類別的熱門關鍵字，請問有什麼我可以協助的嗎？（支援類別例如：政治, 科技, 運動）
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- 利用 Django 的 Template Engine 根據 Session 自動渲染歷史訊息出來 -->
+                {% for log in chat_history %}
+                    <div class="message-row {% if log.role == 'user' %}user{% else %}bot{% endif %}">
+                        <div class="msg {% if log.role == 'model' %}markdown-text d-none{% endif %}">{{ log.text }}</div>
+                        {% if log.role == 'model' %}
+                        <div class="msg markdown-rendered"></div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Chat input form: submit via button or Enter key -->
+            <form id="chat-form" class="d-flex gap-2">
+                {% csrf_token %}
+                <input type="text" id="user-input" class="form-control form-control-lg" placeholder="輸入您的指令...例如：請幫我查詢政治類的熱門關鍵字" autocomplete="off" required>
+                <button type="submit" class="btn btn-primary px-4" id="send-btn">發送</button>
+            </form>
+
+            <!-- App Introduction and Prompts Section -->
+            <div class="mt-4 p-4 border rounded bg-white shadow-sm text-secondary">
+                <h5 class="text-dark">📌 關於此 App (第一階段：原生 genai SDK 架構)</h5>
+                <p>
+                    本系統利用 Google 官方 <code>google.genai</code> 函式庫原生的 <strong>Function Calling (Tool Calling) 機制</strong> 所實作，交談紀錄利用 Django Session 進行管理。將本機定義好的 Python Functions 作為 Tools 傳給 Gemini，它會自己選擇合適的邏輯自動擷取 POA 數據並總結成自然語言。<br>
+                </p>
+
+                <h6 class="mt-4 text-dark"><i class="bi bi-lightbulb-fill"></i> 測試情境提示詞範例（點擊可快速輸入）</h6>
+                <div id="prompt-buttons" class="mt-2">
+                    <!-- 外部搜尋 -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">🌐 外部搜尋 (使用工具：<code>search_and_read_web</code>)</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">請上網搜尋目前輝達（Nvidia）最新的產品動態，也要給我參考資料的連結。</button>
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">請上網查找一下今天台灣的即時天氣，同時也要顯示今天的日期，也要給我參考資料的連結。</button>
+                        </div>
+                    </div>
+
+                    <!-- 統計分析 -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">📊 統計分析 (使用工具：<code>get_top_keywords</code>, <code>get_top_persons</code>)</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">列出政治類中最熱門的前 3 個關鍵字。</button>
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">幫我查詢科技類新聞中最常被提到的人物有哪些？前 3 名</button>
+                        </div>
+                    </div>
+                    <!-- 關聯性分析 -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">📊 關聯性分析 (使用工具：<code>get_keyword_correlation</code>)</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">分析「台積電」與「半導體」之間的關聯度。</button>
+                            <button class="btn btn-outline-success btn-sm prompt-btn text-start">請幫我查一下「張忠謀」這個詞通常跟哪些字一起出現在文章裡？</button>
+                        </div>
+                    </div>
+
+                    <!-- 內容擷取與精準分析 -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">📰 操作資料庫檢索新聞 (使用工具：<code>get_latest_article_by_keyword</code>)</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">請從資料庫中找出關於「蘋果」的最新一篇新聞，列出日期並摘要內容。</button>
+                        </div>
+                    </div>
+
+                    <!-- 讀取本地檔案做內容分析 -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">📄 讀取本地檔案做內容分析 (使用工具：<code>read_local_document</code>)</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">分析知識庫中的 marketing_report.md，總結核心亮點與 KPI。</button>
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">讀取 news_content.md 並摘要黃仁勳對於 AI Agent 的看法。</button>
+                        </div>
+                    </div>
+
+                    <!-- 報告存檔 -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">💾 報告存檔 (使用工具：<code>save_report_to_file</code>)</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">【複合任務】從資料庫中找出關於「蘋果」的最新一篇新聞，，列出日期並摘要內容，接著將這份摘要存成報告檔案。</button>
+                            <button class="btn btn-outline-primary btn-sm prompt-btn text-start">分析目前政治類的熱門關鍵字，並直接將結果存檔。</button>
+                        </div>
+                    </div>
+
+                    <!-- 多輪對話記憶 -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">🧠 多輪對話記憶測試 (Memory Capability)</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-success btn-sm prompt-btn text-start">前面的對話中，有提到哪些重要的人名嗎？</button>
+                            <button class="btn btn-outline-success btn-sm prompt-btn text-start">最後，根據我們剛剛這一連串的對話，用 50 個字以內總結重點。</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 先把已經載入的歷史 markdown 解析出來
+        document.querySelectorAll('.markdown-rendered').forEach((renderDiv) => {
+            const rawTextDiv = renderDiv.previousElementSibling;
+            if (rawTextDiv && rawTextDiv.classList.contains('markdown-text')) {
+                renderDiv.innerHTML = marked.parse(rawTextDiv.textContent);
+                rawTextDiv.remove(); // 移除 raw 以保持乾淨
+            }
+        });
+
+        // 取得聊天介面會用到的 DOM 元素（轉為 jQuery 物件）
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+        const sendBtn = document.getElementById('send-btn');
+        
+        // 從頁面上的 CSRF hidden input 讀取 token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // 新增一則訊息氣泡並自動滾到最底部
+        function appendMessage(sender, text) {
+            const row = document.createElement('div');
+            row.className = `message-row ${sender}`;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg';
+            
+            // Bot 回覆支援 Markdown；使用者訊息用純文字顯示避免 XSS
+            if (sender === 'bot') {
+                msgDiv.innerHTML = marked.parse(text);
+            } else {
+                msgDiv.textContent = text;
+            }
+            
+            row.appendChild(msgDiv);
+            chatBox.appendChild(row);
+            
+            // 自動滾動到最底部
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // 點擊範例按鈕時，快速把內容填入輸入框
+        document.querySelectorAll('.prompt-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                input.value = btn.innerText;
+                input.focus();
+            });
+        });
+
+        // 監聽表單送出事件
+        form.addEventListener('submit', async (e) => {
+            // 阻止表單預設送出行為
+            e.preventDefault();
+            
+            const text = input.value.trim();
+            if (!text) return;
+
+            // 先把使用者輸入顯示在畫面上
+            appendMessage('user', text);
+            input.value = '';
+            sendBtn.disabled = true;
+
+            // 建立一個「載入中」的暫時訊息，等待後端回覆
+            const loadingId = 'loading-' + Date.now();
+            const loadingRow = document.createElement('div');
+            loadingRow.id = loadingId;
+            loadingRow.className = 'message-row bot';
+            loadingRow.innerHTML = '<div class="msg text-muted"><em>思考與查詢中...</em></div>';
+            
+            chatBox.appendChild(loadingRow);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // 發送 POST 請求到後端，攜帶使用者訊息和 CSRF token，這是js的Ajax 方式寫法
+            try {
+                const formData = new FormData();
+                formData.append('message', text);
+
+                const response = await fetch('', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: formData
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+                
+                if (data.error) {
+                    appendMessage('bot', `**系統錯誤：** ${data.error}`);
+                } else {
+                    appendMessage('bot', data.reply);
+                }
+            } catch (error) {
+                document.getElementById(loadingId)?.remove();
+                appendMessage('bot', `**連線失敗：** ${error}`);
+            } finally {
+                sendBtn.disabled = false;
+            }
+        });
+
+        // 在 script 最底端加入這個「清除按鈕」事件
+        const clearBtn = document.getElementById('clear-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', async () => {
+                if (!confirm('確定要清除所有對話紀錄嗎？')) return;
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('csrfmiddlewaretoken', csrfToken);
+                    
+                    const req = await fetch('{% url "app_agent_genaisdk:clear_history" %}', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const res = await req.json();
+                    
+                    if (res.status === 'success') {
+                        // 清空頁面上的元素 (保留最初歡迎語)
+                        chatBox.innerHTML = `
+                        <div class="message-row bot">
+                            <div class="msg">
+                                您好！我是 POA 輿情分析助理。對話已經被清除，請問有什麼我可以協助的嗎？
+                            </div>
+                        </div>`;
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+        }
+
+    });
+</script>
+{% endblock %}
+
+
+{% comment %}
+           // 使用 jQuery $.ajax 的對照寫法
+            const formData = new FormData();
+            formData.append('message', text);
+
+            $.ajax({
+                url: '', // 發送到當前頁面
+                type: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+                data: formData,
+                processData: false, // 告訴 jQuery 不要處理發送的數據 (FormData 必填)
+                contentType: false, // 告訴 jQuery 不要去設定 Content-Type (FormData 必填)
+                success: function(data) {
+                    document.getElementById(loadingId).remove();
+                    if (data.error) {
+                        appendMessage('bot', `**系統錯誤：** ${data.error}`);
+                    } else {
+                        appendMessage('bot', data.reply);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    document.getElementById(loadingId)?.remove();
+                    appendMessage('bot', `**連線失敗：** ${error}`);
+                },
+                complete: function() {
+                    // 不論成功或失敗，最後都會執行這裡，恢復按鈕
+                    sendBtn.disabled = false;
+                }
+            });
+{% endcomment %}

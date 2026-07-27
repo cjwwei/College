@@ -1,0 +1,6 @@
+﻿name,value
+vos_frequency_date_based,"[{'x': '2026-04-19', 'y': 19}]"
+vos_article_count_by_category,"{'category': ['全球', '即時'], 'article_count': [18, 1]}"
+vos_summary,"{'num_occurrence': 19, 'num_frequency': 80, 'photo_url': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Official_Presidential_Portrait_of_President_Donald_J._Trump_%282025%29.jpg/500px-Official_Presidential_Portrait_of_President_Donald_J._Trump_%282025%29.jpg'}"
+article_count_for_django,"[('全球', 18), ('即時', 1)]"
+person_name,'川普'

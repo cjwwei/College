@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Agentic RAG 智慧金融諮詢 | 輿情分析平台
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Premium Styling and Color Palette */
+    .agentic-title-card {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .tool-badge {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+        background-color: #e3f2fd;
+        color: #0d47a1;
+        border: 1px solid #bbdefb;
+    }
+    .tool-item {
+        border-left: 4px solid #1e3c72;
+        padding-left: 12px;
+        margin-bottom: 15px;
+    }
+    .tool-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 2px;
+    }
+    .tool-desc {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+    
+    /* Chat Area */
+    .chat-container {
+        height: 520px;
+        overflow-y: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background-color: #f8fafc;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    /* Message Bubbles */
+    .message-row {
+        display: flex;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    .message-row.user-row {
+        justify-content: flex-end;
+    }
+    .message-row.agent-row {
+        justify-content: flex-start;
+    }
+    
+    .chat-bubble {
+        max-width: 75%;
+        padding: 12px 18px;
+        border-radius: 16px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .user-bubble {
+        background-color: #0d6efd;
+        color: #ffffff;
+        border-bottom-right-radius: 4px;
+    }
+    .agent-bubble {
+        background-color: #ffffff;
+        color: #334155;
+        border: 1px solid #e2e8f0;
+        border-bottom-left-radius: 4px;
+    }
+    .agent-bubble p:last-child {
+        margin-bottom: 0;
+    }
+    .agent-bubble ul, .agent-bubble ol {
+        padding-left: 20px;
+    }
+    .agent-bubble hr {
+        margin: 10px 0;
+        border-color: #cbd5e1;
+    }
+    
+    /* Suggested Questions Buttons */
+    .suggested-btn {
+        font-size: 0.85rem;
+        border-radius: 20px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        color: #475569;
+        transition: all 0.2s ease;
+        padding: 6px 14px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        text-align: left;
+    }
+    .suggested-btn:hover {
+        background-color: #e2e8f0;
+        border-color: #94a3b8;
+        color: #1e293b;
+        transform: translateY(-1px);
+    }
+    
+    /* Thinking Loader */
+    .thinking-indicator {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 15px;
+        background-color: #f1f5f9;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        color: #64748b;
+        width: fit-content;
+        align-self: flex-start;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .thinking-dot {
+        width: 6px;
+        height: 6px;
+        background-color: #64748b;
+        border-radius: 50%;
+        animation: pulse 1.2s infinite ease-in-out;
+    }
+    .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(0.6); opacity: 0.4; }
+        50% { transform: scale(1.2); opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="col-lg-12 mb-3">
+    <div class="card agentic-title-card p-4">
+        <h2 class="m-0"><i class="bi bi-robot"></i> Agentic RAG 智慧金融諮詢代理</h2>
+        <p class="mb-0 mt-2 opacity-75">
+            基於 Gemini模型 與 SQLite 向量資料庫，具備自主決策與多次工具循環調用（ReAct）能力的財經專家。
+        </p>
+    </div>
+</div>
+
+<!-- Left Column: Tool Box Description -->
+<div class="col-lg-4">
+    <div class="card">
+        <div class="card-header"><i class="bi bi-tools"></i> Agent 專屬工具箱 (Toolbox)</div>
+        <div class="card-body">
+            <p class="text-muted small">
+                這款 Agent 能夠精準解讀您的意圖，並自主調用以下工具，甚至會規劃多次的決策路徑來交叉佐證數據：
+            </p>
+            
+            <div class="tool-item">
+                <div class="tool-title">新聞語意檢索工具</div>
+                <span class="tool-badge mb-1 d-inline-block">search_financial_news</span>
+                <div class="tool-desc">
+                    使用 3072 維度向量模型進行語意檢索，比對 SQLite 雙表資料庫中的分塊，並整合特徵關鍵字（如：天璣9400、2奈米）進行加權。
+                </div>
+            </div>
+            
+            <div class="tool-item">
+                <div class="tool-title">分類快速 SQL 檢索</div>
+                <span class="tool-badge mb-1 d-inline-block">list_news_by_category</span>
+                <div class="tool-desc">
+                    當提問屬於清單查詢時，Agent 繞過昂貴的向量搜尋，直接下達 SQL 指令過濾特定產業類別，達到 100% 的精確度。
+                </div>
+            </div>
+            
+            <div class="tool-item">
+                <div class="tool-title">數學目標估值計算</div>
+                <span class="tool-badge mb-1 d-inline-block">calculate_stock_target_price</span>
+                <div class="tool-desc">
+                    提供科學的每股盈餘 (EPS) 與合理本益比相乘算術，防止模型自行心算時產生數字幻覺與偏差。
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="d-grid">
+                <a href="{% url 'app_rag_agent:clear_chat' %}" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash"></i> 清除並重新開始對話
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Right Column: Interactive Chat Interface -->
+<div class="col-lg-8">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-chat-dots-fill"></i> 智慧金融對話視窗</span>
+            <span class="badge bg-success">代理人+RAG語意檢索</span>
+        </div>
+        <div class="card-body">
+            <!-- Chat Container -->
+            <div class="chat-container mb-3" id="chatContainer">
+                {% if not chat_history %}
+                    <div class="text-center my-auto text-muted">
+                        <i class="bi bi-chat-left-quote display-6 mb-3 d-block text-secondary"></i>
+                        <h5>您好！我是您的 Agentic 金融助理</h5>
+                        <p class="small">您可以詢問我有關於台積電、聯發科或鴻海等新聞動態，甚至讓我為您調用估值工具與比對新聞數據。</p>
+                    </div>
+                {% else %}
+                    {% for msg in chat_history %}
+                        <div class="message-row {% if msg.role == 'user' %}user-row{% else %}agent-row{% endif %}">
+                            <div class="chat-bubble {% if msg.role == 'user' %}user-bubble{% else %}agent-bubble{% endif %}" 
+                                 data-raw-content="{{ msg.text|escapejs }}">
+                                {% if msg.role == 'user' %}
+                                    {{ msg.text }}
+                                {% else %}
+                                    <!-- Markdown will be parsed by JS on load -->
+                                    {{ msg.text|linebreaksbr }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Thinking Indicator -->
+                <div class="thinking-indicator" id="thinkingIndicator">
+                    <div class="thinking-dot"></div>
+                    <div class="thinking-dot"></div>
+                    <div class="thinking-dot"></div>
+                    <span>Agent 正在調用工具並思考中...</span>
+                </div>
+            </div>
+            
+            <!-- Suggested Questions -->
+            <div class="mb-3">
+                <p class="text-muted small mb-2"><i class="bi bi-lightbulb"></i> 教學示範提問（點擊可自動輸入並送出）：</p>
+                <div class="d-flex flex-wrap">
+                    <button class="btn suggested-btn" onclick="sendSuggested('幫我查聯發科最新發表的晶片特色是什麼？')">
+                        1. 語意檢索：聯發科晶片特色
+                    </button>
+                    <button class="btn suggested-btn" onclick="sendSuggested('外資今天調高了台積電的目標價。如果我們預估台積電 2026 年的 EPS 為 48 元，且給予合理本益比 25 倍計算，合理股價是多少？這跟新聞裡外資調升後的目標價相比如何？')">
+                        2. 複合決策：台積電目標價新聞計算比對 (超精彩!)
+                    </button>
+                    <button class="btn suggested-btn" onclick="sendSuggested('請幫我整理資料庫中所有屬於『IC設計』類別的新聞連結。')">
+                        3. SQL 精準過濾：IC設計類別新聞連結
+                    </button>
+                    <button class="btn suggested-btn" onclick="sendSuggested('請問今天台北的天氣如何？適合出門嗎？')">
+                        4. 防守防幻覺：無關工具之安全拒答
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Input Form -->
+            <form id="chatForm">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" id="userInput" class="form-control" placeholder="請輸入財經問題..." autocomplete="off" required>
+                    <button class="btn btn-primary" type="submit" id="sendBtn">
+                        <i class="bi bi-send-fill"></i> 送出問題
+                    </button>
+                </div>
+            </form>
+            <div class="mt-4 p-3 rounded-3" style="background:#eef8ff; border:1px solid #cfe2ff;">
+                <h5 class="mb-2">關於 Agentic RAG 金融諮詢</h5>
+                <p class="mb-2">這個專案結合了「RAG（檢索增強式生成）」與「智能代理人」兩種技術，提供一個可查詢財經新聞、計算估值、並以安全策略回應的互動式聊天平台。</p>
+                <a href="{% url 'app_rag_agent:app_intro' %}" class="btn btn-outline-primary btn-sm">了解本 APP 的運作原理與流程</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Marked.js for Premium Markdown Rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- Bootstrap icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<script>
+    // Scroll chat window to bottom
+    function scrollToBottom() {
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Parse markdown in all loaded agent bubbles
+    function parseAllMarkdown() {
+        document.querySelectorAll('.agent-bubble').forEach(bubble => {
+            // If the element has raw content in the attribute, use that
+            const rawContent = bubble.getAttribute('data-raw-content');
+            if (rawContent) {
+                // Decode string escaped for JS
+                const decoded = eval("'" + rawContent.replace(/'/g, "\\'") + "'");
+                bubble.innerHTML = marked.parse(decoded);
+            }
+        });
+    }
+    
+    // Handle Suggested Questions
+    function sendSuggested(questionText) {
+        document.getElementById('userInput').value = questionText;
+        submitChatForm();
+    }
+    
+    // Form submit logic
+    function submitChatForm() {
+        const inputField = document.getElementById('userInput');
+        const userMsg = inputField.value.trim();
+        if (!userMsg) return;
+        
+        // Disable input and button
+        inputField.value = '';
+        inputField.disabled = true;
+        document.getElementById('sendBtn').disabled = true;
+        
+        // Remove empty state text if it exists
+        const emptyState = document.querySelector('.chat-container .text-center');
+        if (emptyState) {
+            emptyState.remove();
+        }
+        
+        // Append user bubble to DOM
+        const chatContainer = document.getElementById('chatContainer');
+        const userRow = document.createElement('div');
+        userRow.className = 'message-row user-row';
+        userRow.innerHTML = `<div class="chat-bubble user-bubble">${escapeHtml(userMsg)}</div>`;
+        // Insert before the loading indicator
+        chatContainer.insertBefore(userRow, document.getElementById('thinkingIndicator'));
+        scrollToBottom();
+        
+        // Show thinking loader
+        const loader = document.getElementById('thinkingIndicator');
+        loader.style.display = 'flex';
+        scrollToBottom();
+        
+        // Send AJAX POST
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const formData = new FormData();
+        formData.append('message', userMsg);
+        formData.append('csrfmiddlewaretoken', csrfToken);
+        
+        fetch('{% url "app_rag_agent:chat_view" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide thinking loader
+            loader.style.display = 'none';
+            
+            // Append agent bubble
+            const agentRow = document.createElement('div');
+            agentRow.className = 'message-row agent-row';
+            
+            if (data.status === 'success') {
+                const parsedHtml = marked.parse(data.answer);
+                agentRow.innerHTML = `<div class="chat-bubble agent-bubble">${parsedHtml}</div>`;
+            } else {
+                agentRow.innerHTML = `<div class="chat-bubble agent-bubble text-danger bg-danger-subtle"><i class="bi bi-exclamation-triangle-fill"></i> ${data.message}</div>`;
+            }
+            
+            chatContainer.insertBefore(agentRow, loader);
+            scrollToBottom();
+            
+            // Re-enable input
+            inputField.disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            inputField.focus();
+        })
+        .catch(err => {
+            loader.style.display = 'none';
+            const agentRow = document.createElement('div');
+            agentRow.className = 'message-row agent-row';
+            agentRow.innerHTML = `<div class="chat-bubble agent-bubble text-danger bg-danger-subtle"><i class="bi bi-exclamation-triangle-fill"></i> 系統連線異常，請稍後再試。</div>`;
+            chatContainer.insertBefore(agentRow, loader);
+            scrollToBottom();
+            
+            inputField.disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            inputField.focus();
+        });
+    }
+    
+    // HTML escape utility
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    
+    // Bind form submit
+    document.getElementById('chatForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitChatForm();
+    });
+    
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+        parseAllMarkdown();
+        scrollToBottom();
+    });
+</script>
+{% endblock %}
